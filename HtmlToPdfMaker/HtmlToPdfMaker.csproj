@@ -5,10 +5,17 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<VersionPrefix>1.0.0</VersionPrefix>
-		<Authors>Alumnus Software Ltd. (Continental Team [Tanmoy Kumar Das, Sounak Garai, Palash J Karmaker])</Authors>
+		<Authors>Tanmoy Kumar Das, Sounak Garai, Palash J Karmaker</Authors>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<PackageProjectUrl>https://github.com/PalashKarmaker/HtmlToPdfMaker</PackageProjectUrl>
-		<DocumentationFile>C:\Users\uie37359\source\repos\PalashKarmaker\HtmlToPdfMaker\Documentation\help.xml</DocumentationFile>		
+		<DocumentationFile>C:\Users\uie37359\source\repos\PalashKarmaker\HtmlToPdfMaker\Documentation\help.xml</DocumentationFile>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Company>Alumnus Software Ltd.</Company>
+		<Copyright>Alumnus Software Ltd.</Copyright>
+		<PackageReadmeFile>help.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/PalashKarmaker/HtmlToPdfMaker</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageTags>html, pdf, converter</PackageTags>		
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -18,6 +25,13 @@
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<IsAotCompatible>True</IsAotCompatible>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Include="..\Documentation\help.md">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="HtmlToPdfConverter.Core" Version="2.0.0" />

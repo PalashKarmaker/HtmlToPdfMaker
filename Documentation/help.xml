@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>HtmlToPdfMaker</name>
+    </assembly>
+    <members>
+        <member name="T:HtmlToPdfMaker.Converter">
+            <summary>
+            Class to convert html to Pdf
+            </summary>
+            <param name="headerRequired"></param>
+            <param name="footerRequired"></param>
+        </member>
+        <member name="M:HtmlToPdfMaker.Converter.#ctor(System.Boolean,System.Boolean)">
+            <summary>
+            Class to convert html to Pdf
+            </summary>
+            <param name="headerRequired"></param>
+            <param name="footerRequired"></param>
+        </member>
+        <member name="M:HtmlToPdfMaker.Converter.ToPdf(System.String,System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="body"></param>
+            <param name="header"></param>
+            <param name="footer"></param>
+            <returns></returns>
+        </member>
+        <member name="M:HtmlToPdfMaker.Converter.GeneratePdf(System.ValueTuple{System.String,System.String,System.String})">
+            <summary>
+            
+            </summary>
+            <param name="tempPaths"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

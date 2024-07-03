@@ -1,10 +1,21 @@
 ﻿using DinkToPdf;
 
 namespace HtmlToPdfMaker;
-
+/// <summary>
+/// Class to convert html to Pdf
+/// </summary>
+/// <param name="headerRequired"></param>
+/// <param name="footerRequired"></param>
 public class Converter(bool headerRequired, bool footerRequired) : SynchronizedConverter(new PdfTools())
 {
     protected readonly string directory = ".\\Pdf\\";
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="body"></param>
+    /// <param name="header"></param>
+    /// <param name="footer"></param>
+    /// <returns></returns>
     public byte[] ToPdf(string body, string header = "", string footer = "")
     {
         var id = Ulid.NewUlid().ToString();
@@ -21,7 +32,11 @@ public class Converter(bool headerRequired, bool footerRequired) : SynchronizedC
         string GetHtmlHeadSnippet(string css) => $"<!doctype html><html><head><link rel=\"stylesheet\" href=\"{css}\"></head>";
         string GetHtmlSnippet(string css, string content) => $"{GetHtmlHeadSnippet(css)}{content}</html>";
     }
-
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="tempPaths"></param>
+    /// <returns></returns>
     protected byte[] GeneratePdf((string header, string body, string footer) tempPaths)
     {
         var doc = new HtmlToPdfDocument()
