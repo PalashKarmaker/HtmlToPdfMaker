@@ -7,8 +7,8 @@ public class ConverterTests
     public void ToPdfTest()
     {
         List<ContentSet> contentSets = [];
-        contentSets.Add(SetContents("<div><h1>Palash J Karmaker</h1></div>", "<h3><u>Header1</u></h3>", "My page"));
-        contentSets.Add(SetContents("<div><b>Спокойной ночи</b></div>", "<h3><u>Спокойной ночи</u><p>शुभ रात्रि</p></h3>", "Test Page"));
+        contentSets.Add(SetContents("<body><h3>Спокойной ночи</h3><p>शुभ रात्रि</p><p>Português para principiantes</p><hr><p>আমি </p></body>", "<body><div><b>Спокойной ночи</b></div></body>", "Test Page"));
+        contentSets.Add(SetContents("<body><div><h1>Palash J Karmaker</h1></div></body>", "<body><h3><u>Header1</u></h3>", "My page"));
         using Convert cvt = new(contentSets);
         var data = cvt.ToPdfAsync(CancellationToken.None).Result;
         File.WriteAllBytes(AppDomain.CurrentDomain.BaseDirectory + "\\Pdf\\test2.pdf", data);

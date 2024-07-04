@@ -79,7 +79,8 @@ public class Convert(IReadOnlyList<ContentSet> contents, string? tempRootFolder 
         {
             StringBuilder sb = new("<!doctype html><html>");
             sb.Append($"<head>");
-            sb.Append($"<link rel=\"stylesheet\" href=\"{cssPath}\">");
+            var style = "* { font-family: \"Arial Unicode MS\", \"Lucida Sans Unicode\", \"DejaVu Sans\", \"Quivira\", \"Symbola\", \"Code2000\" ; }";
+            sb.Append($"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" /><link rel=\"stylesheet\" href=\"{cssPath}\"><style>{style}</style>");
             sb.Append($"</head>");
             sb.Append(content);
             sb.Append("</html>");
