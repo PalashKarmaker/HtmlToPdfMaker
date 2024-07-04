@@ -17,7 +17,9 @@
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>html, pdf, converter</PackageTags>		
 	</PropertyGroup>
-
+	<PropertyGroup>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<IsAotCompatible>True</IsAotCompatible>
 	</PropertyGroup>

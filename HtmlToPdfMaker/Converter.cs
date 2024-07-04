@@ -5,22 +5,28 @@ using Utility;
 namespace HtmlToPdfMaker;
 /// <summary>Class to convert html to Pdf</summary>
 /// <example>
-/// asa
-/// <code>List&lt;ContentSet&gt; contentSets = [];
-/// contentSets.Add(SetContents("&lt;div&gt;&lt;h1&gt;Palash J Karmaker&lt;/h1&gt;&lt;/div&gt;", "&lt;h3&gt;&lt;u&gt;Header1&lt;/u&gt;&lt;/h3&gt;"));
-/// contentSets.Add(SetContents("&lt;div&gt;&lt;b&gt;Hello world&lt;/b&gt;&lt;/div&gt;", "&lt;h3&gt;&lt;u&gt;Header2&lt;/u&gt;&lt;/h3&gt;"));
-/// using Convert cvt = new(contentSets);
-/// var data = cvt.ToPdfAsync(CancellationToken.None).Result;
-/// File.WriteAllBytes(AppDomain.CurrentDomain.BaseDirectory + "\\test2.pdf", data);
-/// Assert.IsTrue(data.Length &gt; 0);
-///
-/// static ContentSet SetContents(string bodyHtml, string headerHtml)
+/// Usage:
+/// <code>
+/// [TestMethod()]
+/// public void ToPdfTest()
 /// {
-///     var header = Content.CreateDefaultStyledHeader(headerHtml);
-///     var footer = Content.CreateDefaultStyledFooter(string.Empty);
-///     var body = Content.CreateDefaultStyledBody(bodyHtml);
-///     return new(body, header, footer);
-/// }</code></example>
+///     List&lt;ContentSet&gt; contentSets = [];
+///     contentSets.Add(SetContents("&lt;body&gt;&lt;h3&gt;Спокойной ночи&lt;/h3&gt;&lt;p&gt;शुभ रात्रि&lt;/p&gt;&lt;p&gt;Português para principiantes&lt;/p&gt;&lt;hr /&gt;&lt;p&gt;আমি &lt;/p&gt;&lt;/body&gt;", "&lt;body&gt;&lt;div&gt;&lt;b&gt;Спокойной ночи&lt;/b&gt;&lt;/div&gt;&lt;/body&gt;", "Test Page"));
+///     contentSets.Add(SetContents("&lt;body&gt;&lt;div&gt;&lt;h1&gt;Palash J Karmaker&lt;/h1&gt;&lt;/div&gt;&lt;/body&gt;", "&lt;body&gt;&lt;h3&gt;&lt;u&gt;Header1&lt;/u&gt;&lt;/h3&gt;", "My page"));
+///     using Convert cvt = new(contentSets);
+///     var data = cvt.ToPdfAsync(CancellationToken.None).Result;
+///     File.WriteAllBytes(AppDomain.CurrentDomain.BaseDirectory + "\\Pdf\\test2.pdf", data);
+///     Assert.IsTrue(data.Length &gt; 0);
+///
+///     static ContentSet SetContents(string bodyHtml, string headerHtml, string footerHtml)
+///     {
+///         var header = Content.CreateDefaultStyledHeader(headerHtml);
+///         var footer = Content.CreateDefaultStyledFooter(footerHtml);
+///         var body = Content.CreateDefaultStyledBody(bodyHtml);
+///         return new(body, header, footer);
+///     }
+/// }</code>
+/// </example>
 /// <seealso cref="Utility.Disposable" />
 public class Convert(IReadOnlyList<ContentSet> contents, string? tempRootFolder = null, Orientation orientation = Orientation.Portrait, PaperKind paperKind = PaperKind.A3) : Disposable
 {
