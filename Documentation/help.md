@@ -4,8 +4,9 @@
 ## Contents
 
 - [Convert](#T-HtmlToPdfMaker-Convert 'HtmlToPdfMaker.Convert')
-  - [#ctor()](#M-HtmlToPdfMaker-Convert-#ctor-System-Collections-Generic-IReadOnlyList{HtmlToPdfMaker-ContentSet},DinkToPdf-Orientation,DinkToPdf-PaperKind- 'HtmlToPdfMaker.Convert.#ctor(System.Collections.Generic.IReadOnlyList{HtmlToPdfMaker.ContentSet},DinkToPdf.Orientation,DinkToPdf.PaperKind)')
+  - [#ctor()](#M-HtmlToPdfMaker-Convert-#ctor-System-Collections-Generic-IReadOnlyList{HtmlToPdfMaker-ContentSet},System-String,DinkToPdf-Orientation,DinkToPdf-PaperKind- 'HtmlToPdfMaker.Convert.#ctor(System.Collections.Generic.IReadOnlyList{HtmlToPdfMaker.ContentSet},System.String,DinkToPdf.Orientation,DinkToPdf.PaperKind)')
   - [tempFolder](#F-HtmlToPdfMaker-Convert-tempFolder 'HtmlToPdfMaker.Convert.tempFolder')
+  - [GeneratePdf(objSettings)](#M-HtmlToPdfMaker-Convert-GeneratePdf-System-Collections-Generic-List{DinkToPdf-ObjectSettings}- 'HtmlToPdfMaker.Convert.GeneratePdf(System.Collections.Generic.List{DinkToPdf.ObjectSettings})')
   - [ReleaseResources()](#M-HtmlToPdfMaker-Convert-ReleaseResources 'HtmlToPdfMaker.Convert.ReleaseResources')
   - [ToPdfAsync(token)](#M-HtmlToPdfMaker-Convert-ToPdfAsync-System-Threading-CancellationToken- 'HtmlToPdfMaker.Convert.ToPdfAsync(System.Threading.CancellationToken)')
 
@@ -20,11 +21,33 @@ HtmlToPdfMaker
 
 Class to convert html to Pdf
 
+##### Example
+
+asa
+
+```
+List&lt;ContentSet&gt; contentSets = [];
+             contentSets.Add(SetContents("&lt;div&gt;&lt;h1&gt;Palash J Karmaker&lt;/h1&gt;&lt;/div&gt;", "&lt;h3&gt;&lt;u&gt;Header1&lt;/u&gt;&lt;/h3&gt;"));
+             contentSets.Add(SetContents("&lt;div&gt;&lt;b&gt;Hello world&lt;/b&gt;&lt;/div&gt;", "&lt;h3&gt;&lt;u&gt;Header2&lt;/u&gt;&lt;/h3&gt;"));
+             using Convert cvt = new(contentSets);
+             var data = cvt.ToPdfAsync(CancellationToken.None).Result;
+             File.WriteAllBytes(AppDomain.CurrentDomain.BaseDirectory + "\\test2.pdf", data);
+             Assert.IsTrue(data.Length &gt; 0);
+            
+             static ContentSet SetContents(string bodyHtml, string headerHtml)
+             {
+                 var header = Content.CreateDefaultStyledHeader(headerHtml);
+                 var footer = Content.CreateDefaultStyledFooter(string.Empty);
+                 var body = Content.CreateDefaultStyledBody(bodyHtml);
+                 return new(body, header, footer);
+             }
+```
+
 ##### See Also
 
 - [Utility.Disposable](#T-Utility-Disposable 'Utility.Disposable')
 
-<a name='M-HtmlToPdfMaker-Convert-#ctor-System-Collections-Generic-IReadOnlyList{HtmlToPdfMaker-ContentSet},DinkToPdf-Orientation,DinkToPdf-PaperKind-'></a>
+<a name='M-HtmlToPdfMaker-Convert-#ctor-System-Collections-Generic-IReadOnlyList{HtmlToPdfMaker-ContentSet},System-String,DinkToPdf-Orientation,DinkToPdf-PaperKind-'></a>
 ### #ctor() `constructor`
 
 ##### Summary
@@ -34,6 +57,28 @@ Class to convert html to Pdf
 ##### Parameters
 
 This constructor has no parameters.
+
+##### Example
+
+asa
+
+```
+List&lt;ContentSet&gt; contentSets = [];
+             contentSets.Add(SetContents("&lt;div&gt;&lt;h1&gt;Palash J Karmaker&lt;/h1&gt;&lt;/div&gt;", "&lt;h3&gt;&lt;u&gt;Header1&lt;/u&gt;&lt;/h3&gt;"));
+             contentSets.Add(SetContents("&lt;div&gt;&lt;b&gt;Hello world&lt;/b&gt;&lt;/div&gt;", "&lt;h3&gt;&lt;u&gt;Header2&lt;/u&gt;&lt;/h3&gt;"));
+             using Convert cvt = new(contentSets);
+             var data = cvt.ToPdfAsync(CancellationToken.None).Result;
+             File.WriteAllBytes(AppDomain.CurrentDomain.BaseDirectory + "\\test2.pdf", data);
+             Assert.IsTrue(data.Length &gt; 0);
+            
+             static ContentSet SetContents(string bodyHtml, string headerHtml)
+             {
+                 var header = Content.CreateDefaultStyledHeader(headerHtml);
+                 var footer = Content.CreateDefaultStyledFooter(string.Empty);
+                 var body = Content.CreateDefaultStyledBody(bodyHtml);
+                 return new(body, header, footer);
+             }
+```
 
 ##### See Also
 
@@ -45,6 +90,23 @@ This constructor has no parameters.
 ##### Summary
 
 The tempFolder
+
+<a name='M-HtmlToPdfMaker-Convert-GeneratePdf-System-Collections-Generic-List{DinkToPdf-ObjectSettings}-'></a>
+### GeneratePdf(objSettings) `method`
+
+##### Summary
+
+Generates the PDF.
+
+##### Returns
+
+
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| objSettings | [System.Collections.Generic.List{DinkToPdf.ObjectSettings}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.List 'System.Collections.Generic.List{DinkToPdf.ObjectSettings}') | The object settings. |
 
 <a name='M-HtmlToPdfMaker-Convert-ReleaseResources'></a>
 ### ReleaseResources() `method`

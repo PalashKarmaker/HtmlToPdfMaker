@@ -3,11 +3,26 @@ using System.Text;
 using Utility;
 
 namespace HtmlToPdfMaker;
-/// <summary>
-/// Class to convert html to Pdf
-/// </summary>
+/// <summary>Class to convert html to Pdf</summary>
+/// <example>
+/// asa
+/// <code>List&lt;ContentSet&gt; contentSets = [];
+/// contentSets.Add(SetContents("&lt;div&gt;&lt;h1&gt;Palash J Karmaker&lt;/h1&gt;&lt;/div&gt;", "&lt;h3&gt;&lt;u&gt;Header1&lt;/u&gt;&lt;/h3&gt;"));
+/// contentSets.Add(SetContents("&lt;div&gt;&lt;b&gt;Hello world&lt;/b&gt;&lt;/div&gt;", "&lt;h3&gt;&lt;u&gt;Header2&lt;/u&gt;&lt;/h3&gt;"));
+/// using Convert cvt = new(contentSets);
+/// var data = cvt.ToPdfAsync(CancellationToken.None).Result;
+/// File.WriteAllBytes(AppDomain.CurrentDomain.BaseDirectory + "\\test2.pdf", data);
+/// Assert.IsTrue(data.Length &gt; 0);
+///
+/// static ContentSet SetContents(string bodyHtml, string headerHtml)
+/// {
+///     var header = Content.CreateDefaultStyledHeader(headerHtml);
+///     var footer = Content.CreateDefaultStyledFooter(string.Empty);
+///     var body = Content.CreateDefaultStyledBody(bodyHtml);
+///     return new(body, header, footer);
+/// }</code></example>
 /// <seealso cref="Utility.Disposable" />
-public class Convert(IReadOnlyList<ContentSet> contents, Orientation orientation = Orientation.Portrait, PaperKind paperKind = PaperKind.A3) : Disposable
+public class Convert(IReadOnlyList<ContentSet> contents, string? tempRootFolder = null, Orientation orientation = Orientation.Portrait, PaperKind paperKind = PaperKind.A3) : Disposable
 {
     GlobalSettings globalSettings = new()
     {
@@ -15,12 +30,11 @@ public class Convert(IReadOnlyList<ContentSet> contents, Orientation orientation
         Orientation = orientation,
         PaperSize = paperKind,
     };
-    static readonly string tempRootFolder = $"{AppDomain.CurrentDomain.BaseDirectory}\\Pdf\\";
-    static SynchronizedConverter cvt = new(new PdfTools());
+    static readonly SynchronizedConverter cvt = new(new PdfTools());
     /// <summary>
     /// The tempFolder
     /// </summary>
-    protected readonly string tempFolder = $"{tempRootFolder}\\{Ulid.NewUlid()}";
+    protected readonly string tempFolder = $"{tempRootFolder ?? AppDomain.CurrentDomain.BaseDirectory}\\Pdf\\{Ulid.NewUlid()}";
     /// <summary>
     /// Releases the resources.
     /// </summary>
@@ -74,6 +88,11 @@ public class Convert(IReadOnlyList<ContentSet> contents, Orientation orientation
             return path;
         }
     }
+    /// <summary>
+    /// Generates the PDF.
+    /// </summary>
+    /// <param name="objSettings">The object settings.</param>
+    /// <returns></returns>
     protected byte[] GeneratePdf(List<ObjectSettings> objSettings)
     {
         var doc = new HtmlToPdfDocument()
