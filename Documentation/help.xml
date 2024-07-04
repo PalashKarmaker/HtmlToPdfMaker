@@ -10,28 +10,31 @@
             </summary>
             <param name="headerRequired"></param>
             <param name="footerRequired"></param>
+            <param name="tempRootFolder"></param>
         </member>
-        <member name="M:HtmlToPdfMaker.Converter.#ctor(System.Boolean,System.Boolean)">
+        <member name="M:HtmlToPdfMaker.Converter.#ctor(HtmlToPdfMaker.Content,HtmlToPdfMaker.Content,HtmlToPdfMaker.Content,DinkToPdf.Orientation,DinkToPdf.PaperKind)">
             <summary>
             Class to convert html to Pdf
             </summary>
             <param name="headerRequired"></param>
             <param name="footerRequired"></param>
+            <param name="tempRootFolder"></param>
         </member>
-        <member name="M:HtmlToPdfMaker.Converter.ToPdf(System.String,System.String,System.String)">
+        <member name="F:HtmlToPdfMaker.Converter.tempFolder">
             <summary>
-            
+            The tempFolder
             </summary>
-            <param name="body"></param>
-            <param name="header"></param>
-            <param name="footer"></param>
-            <returns></returns>
         </member>
-        <member name="M:HtmlToPdfMaker.Converter.GeneratePdf(System.ValueTuple{System.String,System.String,System.String})">
+        <member name="M:HtmlToPdfMaker.Converter.ReleaseResources">
             <summary>
-            
+            Releases the resources.
             </summary>
-            <param name="tempPaths"></param>
+        </member>
+        <member name="M:HtmlToPdfMaker.Converter.ToPdfAsync(System.Threading.CancellationToken)">
+            <summary>
+            Converts to pdf.
+            </summary>
+            <param name="token">The token.</param>
             <returns></returns>
         </member>
     </members>

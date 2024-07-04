@@ -1,4 +1,6 @@
 ﻿using DinkToPdf;
+using System.Text;
+using Utility;
 
 namespace HtmlToPdfMaker;
 /// <summary>
@@ -6,58 +8,76 @@ namespace HtmlToPdfMaker;
 /// </summary>
 /// <param name="headerRequired"></param>
 /// <param name="footerRequired"></param>
-public class Converter(bool headerRequired, bool footerRequired) : SynchronizedConverter(new PdfTools())
+/// <param name="tempRootFolder"></param>
+public class Converter(Content body, Content header, Content footer, Orientation orientation = Orientation.Portrait, PaperKind paperKind = PaperKind.A3) : Disposable
 {
-    protected readonly string directory = ".\\Pdf\\";
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="body"></param>
-    /// <param name="header"></param>
-    /// <param name="footer"></param>
-    /// <returns></returns>
-    public byte[] ToPdf(string body, string header = "", string footer = "")
+    GlobalSettings globalSettings = new() 
     {
-        var id = Ulid.NewUlid().ToString();
-        (string body, string header, string footer) tempPaths = 
-            ($"{directory}b_{id}.html", 
-                headerRequired? $"{directory}h_{id}.html": string.Empty, 
-                footerRequired? 
-                    footer.Length == 0? $"{directory}Footer.html": $"{directory}f_{id}.html"
-                        : string.Empty);
-        File.WriteAllText(tempPaths.header, GetHtmlSnippet("header.css", header));
-        File.WriteAllText(tempPaths.body, GetHtmlSnippet("body.css", body));
-        return GeneratePdf(tempPaths);
-
-        string GetHtmlHeadSnippet(string css) => $"<!doctype html><html><head><link rel=\"stylesheet\" href=\"{css}\"></head>";
-        string GetHtmlSnippet(string css, string content) => $"{GetHtmlHeadSnippet(css)}{content}</html>";
+        ColorMode = ColorMode.Color,
+        Orientation = orientation,
+        PaperSize = paperKind,
+    };
+    static readonly string tempRootFolder = $"{AppDomain.CurrentDomain.BaseDirectory}\\Pdf\\";
+    static SynchronizedConverter cvt = new(new PdfTools());
+    /// <summary>
+    /// The tempFolder
+    /// </summary>
+    protected readonly string tempFolder = $"{tempRootFolder}\\{Ulid.NewUlid()}";
+    /// <summary>
+    /// Releases the resources.
+    /// </summary>
+    public override void ReleaseResources()
+    {
+        if (Directory.Exists(tempFolder))
+            Directory.Delete(tempFolder, true);
     }
     /// <summary>
-    /// 
+    /// Converts to pdf.
     /// </summary>
-    /// <param name="tempPaths"></param>
+    /// <param name="token">The token.</param>
     /// <returns></returns>
-    protected byte[] GeneratePdf((string header, string body, string footer) tempPaths)
+    public async Task<byte[]> ToPdfAsync(CancellationToken token)
+    {
+        if (!Directory.Exists(tempFolder))
+            Directory.CreateDirectory(tempFolder);
+        var h = MakeTempFileAsync(ContentType.Header, header.Html, header.Css, token);
+        var f = MakeTempFileAsync(ContentType.Footer, footer.Html, header.Css, token);
+        var b = MakeTempFileAsync(ContentType.Body, body.Html, header.Css, token);
+        return GeneratePdf(new()
+        {
+            { ContentType.Body, await b },
+            { ContentType.Header, await h },
+            { ContentType.Footer, await f }
+        });
+    }
+    protected async Task<string> MakeTempFileAsync(ContentType contentType, string content, Uri cssPath, CancellationToken token)
+    {
+        StringBuilder sb = new("<!doctype html><html>");
+        sb.Append($"<head>");
+        sb.Append($"<link rel=\"stylesheet\" href=\"{cssPath}\">");
+        sb.Append($"</head>");
+        sb.Append(content);
+        sb.Append("</html>");
+        var path = $"{tempFolder}\\{contentType}.html";
+        await File.WriteAllTextAsync(path, sb.ToString(), token);
+        return path;
+    }
+    protected byte[] GeneratePdf(Dictionary<ContentType, string> filePaths)
     {
         var doc = new HtmlToPdfDocument()
         {
-            GlobalSettings =
-            {
-                ColorMode = ColorMode.Color,
-                Orientation = Orientation.Portrait,
-                PaperSize = PaperKind.A3,
-            },
+            GlobalSettings = globalSettings,
             Objects =
             {
                 new ObjectSettings() {
                     PagesCount = true,
-                    Page = tempPaths.body,
+                    Page = filePaths[ContentType.Body],
                     WebSettings = { DefaultEncoding = "utf-8", PrintMediaType = true },
-                    HeaderSettings = { HtmUrl = tempPaths.header },
-                    FooterSettings = { HtmUrl = tempPaths.footer, Right = "Page [page] of [toPage]", FontSize = 9 }
+                    HeaderSettings = { HtmUrl = filePaths[ContentType.Header] },
+                    FooterSettings = { HtmUrl = filePaths[ContentType.Footer], Right = "Page [page] of [toPage]", FontSize = 9 }
                 }
             }
         };
-        return Convert(doc);        
+        return cvt.Convert(doc);
     }
 }
