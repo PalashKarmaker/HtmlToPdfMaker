@@ -80,7 +80,7 @@ public class Convert(IReadOnlyList<ContentSet> contents, string? tempRootFolder 
             StringBuilder sb = new("<!doctype html><html>");
             sb.Append($"<head>");
             var style = "* { font-family: \"Arial Unicode MS\", \"Lucida Sans Unicode\", \"DejaVu Sans\", \"Quivira\", \"Symbola\", \"Code2000\" ; }";
-            sb.Append($"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" /><link rel=\"stylesheet\" href=\"{cssPath}\"><style>{style}</style>");
+            sb.Append($"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" /><style>{style}</style><link rel=\"stylesheet\" href=\"{cssPath}\">");
             sb.Append($"</head>");
             sb.Append(content);
             sb.Append("</html>");
