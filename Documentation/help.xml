@@ -4,33 +4,29 @@
         <name>HtmlToPdfMaker</name>
     </assembly>
     <members>
-        <member name="T:HtmlToPdfMaker.Converter">
+        <member name="T:HtmlToPdfMaker.Convert">
             <summary>
             Class to convert html to Pdf
             </summary>
-            <param name="headerRequired"></param>
-            <param name="footerRequired"></param>
-            <param name="tempRootFolder"></param>
+            <seealso cref="T:Utility.Disposable" />
         </member>
-        <member name="M:HtmlToPdfMaker.Converter.#ctor(HtmlToPdfMaker.Content,HtmlToPdfMaker.Content,HtmlToPdfMaker.Content,DinkToPdf.Orientation,DinkToPdf.PaperKind)">
+        <member name="M:HtmlToPdfMaker.Convert.#ctor(System.Collections.Generic.IReadOnlyList{HtmlToPdfMaker.ContentSet},DinkToPdf.Orientation,DinkToPdf.PaperKind)">
             <summary>
             Class to convert html to Pdf
             </summary>
-            <param name="headerRequired"></param>
-            <param name="footerRequired"></param>
-            <param name="tempRootFolder"></param>
+            <seealso cref="T:Utility.Disposable" />
         </member>
-        <member name="F:HtmlToPdfMaker.Converter.tempFolder">
+        <member name="F:HtmlToPdfMaker.Convert.tempFolder">
             <summary>
             The tempFolder
             </summary>
         </member>
-        <member name="M:HtmlToPdfMaker.Converter.ReleaseResources">
+        <member name="M:HtmlToPdfMaker.Convert.ReleaseResources">
             <summary>
             Releases the resources.
             </summary>
         </member>
-        <member name="M:HtmlToPdfMaker.Converter.ToPdfAsync(System.Threading.CancellationToken)">
+        <member name="M:HtmlToPdfMaker.Convert.ToPdfAsync(System.Threading.CancellationToken)">
             <summary>
             Converts to pdf.
             </summary>

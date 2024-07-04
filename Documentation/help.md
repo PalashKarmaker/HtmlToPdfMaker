@@ -3,14 +3,14 @@
 
 ## Contents
 
-- [Converter](#T-HtmlToPdfMaker-Converter 'HtmlToPdfMaker.Converter')
-  - [#ctor(headerRequired,footerRequired,tempRootFolder)](#M-HtmlToPdfMaker-Converter-#ctor-HtmlToPdfMaker-Content,HtmlToPdfMaker-Content,HtmlToPdfMaker-Content,DinkToPdf-Orientation,DinkToPdf-PaperKind- 'HtmlToPdfMaker.Converter.#ctor(HtmlToPdfMaker.Content,HtmlToPdfMaker.Content,HtmlToPdfMaker.Content,DinkToPdf.Orientation,DinkToPdf.PaperKind)')
-  - [tempFolder](#F-HtmlToPdfMaker-Converter-tempFolder 'HtmlToPdfMaker.Converter.tempFolder')
-  - [ReleaseResources()](#M-HtmlToPdfMaker-Converter-ReleaseResources 'HtmlToPdfMaker.Converter.ReleaseResources')
-  - [ToPdfAsync(token)](#M-HtmlToPdfMaker-Converter-ToPdfAsync-System-Threading-CancellationToken- 'HtmlToPdfMaker.Converter.ToPdfAsync(System.Threading.CancellationToken)')
+- [Convert](#T-HtmlToPdfMaker-Convert 'HtmlToPdfMaker.Convert')
+  - [#ctor()](#M-HtmlToPdfMaker-Convert-#ctor-System-Collections-Generic-IReadOnlyList{HtmlToPdfMaker-ContentSet},DinkToPdf-Orientation,DinkToPdf-PaperKind- 'HtmlToPdfMaker.Convert.#ctor(System.Collections.Generic.IReadOnlyList{HtmlToPdfMaker.ContentSet},DinkToPdf.Orientation,DinkToPdf.PaperKind)')
+  - [tempFolder](#F-HtmlToPdfMaker-Convert-tempFolder 'HtmlToPdfMaker.Convert.tempFolder')
+  - [ReleaseResources()](#M-HtmlToPdfMaker-Convert-ReleaseResources 'HtmlToPdfMaker.Convert.ReleaseResources')
+  - [ToPdfAsync(token)](#M-HtmlToPdfMaker-Convert-ToPdfAsync-System-Threading-CancellationToken- 'HtmlToPdfMaker.Convert.ToPdfAsync(System.Threading.CancellationToken)')
 
-<a name='T-HtmlToPdfMaker-Converter'></a>
-## Converter `type`
+<a name='T-HtmlToPdfMaker-Convert'></a>
+## Convert `type`
 
 ##### Namespace
 
@@ -20,14 +20,12 @@ HtmlToPdfMaker
 
 Class to convert html to Pdf
 
-##### Parameters
+##### See Also
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| headerRequired | [T:HtmlToPdfMaker.Converter](#T-T-HtmlToPdfMaker-Converter 'T:HtmlToPdfMaker.Converter') |  |
+- [Utility.Disposable](#T-Utility-Disposable 'Utility.Disposable')
 
-<a name='M-HtmlToPdfMaker-Converter-#ctor-HtmlToPdfMaker-Content,HtmlToPdfMaker-Content,HtmlToPdfMaker-Content,DinkToPdf-Orientation,DinkToPdf-PaperKind-'></a>
-### #ctor(headerRequired,footerRequired,tempRootFolder) `constructor`
+<a name='M-HtmlToPdfMaker-Convert-#ctor-System-Collections-Generic-IReadOnlyList{HtmlToPdfMaker-ContentSet},DinkToPdf-Orientation,DinkToPdf-PaperKind-'></a>
+### #ctor() `constructor`
 
 ##### Summary
 
@@ -35,20 +33,20 @@ Class to convert html to Pdf
 
 ##### Parameters
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| headerRequired | [HtmlToPdfMaker.Content](#T-HtmlToPdfMaker-Content 'HtmlToPdfMaker.Content') |  |
-| footerRequired | [HtmlToPdfMaker.Content](#T-HtmlToPdfMaker-Content 'HtmlToPdfMaker.Content') |  |
-| tempRootFolder | [HtmlToPdfMaker.Content](#T-HtmlToPdfMaker-Content 'HtmlToPdfMaker.Content') |  |
+This constructor has no parameters.
 
-<a name='F-HtmlToPdfMaker-Converter-tempFolder'></a>
+##### See Also
+
+- [Utility.Disposable](#T-Utility-Disposable 'Utility.Disposable')
+
+<a name='F-HtmlToPdfMaker-Convert-tempFolder'></a>
 ### tempFolder `constants`
 
 ##### Summary
 
 The tempFolder
 
-<a name='M-HtmlToPdfMaker-Converter-ReleaseResources'></a>
+<a name='M-HtmlToPdfMaker-Convert-ReleaseResources'></a>
 ### ReleaseResources() `method`
 
 ##### Summary
@@ -59,7 +57,7 @@ Releases the resources.
 
 This method has no parameters.
 
-<a name='M-HtmlToPdfMaker-Converter-ToPdfAsync-System-Threading-CancellationToken-'></a>
+<a name='M-HtmlToPdfMaker-Convert-ToPdfAsync-System-Threading-CancellationToken-'></a>
 ### ToPdfAsync(token) `method`
 
 ##### Summary

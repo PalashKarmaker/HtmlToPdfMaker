@@ -15,3 +15,5 @@ public class Content(string htmlContent, Uri css)
 
     public static Content CreateDefaultStyledBody(string htmlContent) => new(htmlContent, ContentType.Body);
 }
+public record ContentSet(Content Body, Content Header, Content Footer);
+public record PathSet(string Body, string Header, string Footer);
