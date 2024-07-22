@@ -30,7 +30,7 @@ namespace HtmlToPdfMaker;
 /// <seealso cref="Utility.Disposable" />
 public class Convert(IReadOnlyList<ContentSet> contents, string? tempRootFolder = null, Orientation orientation = Orientation.Portrait, PaperKind paperKind = PaperKind.A3) : Disposable
 {
-    GlobalSettings globalSettings = new()
+    readonly GlobalSettings globalSettings = new()
     {
         ColorMode = ColorMode.Color,
         Orientation = orientation,
