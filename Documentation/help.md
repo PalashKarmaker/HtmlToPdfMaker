@@ -141,13 +141,13 @@ This method has no parameters.
 Pattern:
 
 ```
-[\\w\\.\\/\\:\\-]+\\.png
+[\\w\\.\\/\\:\\-]+\\.(?&lt;ext&gt;(png)|(webp))
 ```
 
 Options:
 
 ```
-RegexOptions.IgnoreCase
+RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture
 ```
 
 Explanation:

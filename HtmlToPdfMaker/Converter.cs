@@ -89,12 +89,14 @@ public partial class Convert(IReadOnlyList<ContentSet> contents, string? tempRoo
             using HttpClient client = new();
             var counter = 1;
             content = pngPattern.Replace(content, m =>
-            {
+            {                
                 var imageSavePath = $"{tempFolder}\\{counter}.png";
                 if (!File.Exists(imageSavePath))
                 {
                     var u = new Uri(m.Value);
                     var data = u.IsFile ? File.ReadAllBytes(m.Value) : client.GetByteArrayAsync(u).Result;
+                    if (m.Groups["ext"].Value.Equals("webp", StringComparison.CurrentCultureIgnoreCase))
+                        data = ImageConverter.Convert.To(data);
                     File.WriteAllBytes(imageSavePath, data);
                 }
                 var c = new Uri(imageSavePath).ToString();
@@ -128,6 +130,6 @@ public partial class Convert(IReadOnlyList<ContentSet> contents, string? tempRoo
         return cvt.Convert(doc);
     }
 
-    [GeneratedRegex("[\\w\\.\\/\\:\\-]+\\.((png)|(webp))", RegexOptions.IgnoreCase, "en-US")]
+    [GeneratedRegex("[\\w\\.\\/\\:\\-]+\\.(?<ext>(png)|(webp))", RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture, "en-US")]
     private static partial Regex PngPattern();
 }

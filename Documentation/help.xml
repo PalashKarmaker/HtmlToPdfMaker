@@ -85,16 +85,24 @@
         <member name="M:HtmlToPdfMaker.Convert.PngPattern">
             <remarks>
             Pattern:<br/>
-            <code>[\\w\\.\\/\\:\\-]+\\.png</code><br/>
+            <code>[\\w\\.\\/\\:\\-]+\\.(?&lt;ext&gt;(png)|(webp))</code><br/>
             Options:<br/>
-            <code>RegexOptions.IgnoreCase</code><br/>
+            <code>RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture</code><br/>
             Explanation:<br/>
             <code>
             ○ Match a character in the set [--/:\w] greedily at least once.<br/>
             ○ Match '.'.<br/>
-            ○ Match a character in the set [Pp].<br/>
-            ○ Match a character in the set [Nn].<br/>
-            ○ Match a character in the set [Gg].<br/>
+            ○ "ext" capture group.<br/>
+                ○ Match with 2 alternative expressions, atomically.<br/>
+                    ○ Match a sequence of expressions.<br/>
+                        ○ Match a character in the set [Pp].<br/>
+                        ○ Match a character in the set [Nn].<br/>
+                        ○ Match a character in the set [Gg].<br/>
+                    ○ Match a sequence of expressions.<br/>
+                        ○ Match a character in the set [Ww].<br/>
+                        ○ Match a character in the set [Ee].<br/>
+                        ○ Match a character in the set [Bb].<br/>
+                        ○ Match a character in the set [Pp].<br/>
             </code>
             </remarks>
         </member>
