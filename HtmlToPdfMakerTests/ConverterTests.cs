@@ -1,9 +1,11 @@
-﻿namespace HtmlToPdfMaker.Tests;
+﻿using System.Diagnostics;
+
+namespace HtmlToPdfMaker.Tests;
 
 [TestClass()]
 public class ConverterTests
 {
-    string rootDirectory = $"C:\\Users\\uie37359\\Downloads\\HtmlToPdfSample\\";
+    readonly string rootDirectory = $"C:\\Users\\uie37359\\Downloads\\HtmlToPdfSample\\";
     [TestMethod]
     public void ToPdfTest()
     {
@@ -45,8 +47,11 @@ public class ConverterTests
         GetContents("Eng", out var bodyEngHtml, out var headerEngHtml, out var footerEngHtml);
         contentSets.Add(SetContents(bodyEngHtml, headerEngHtml, footerEngHtml));
         using Convert cvt = new(contentSets);
+        Stopwatch w = Stopwatch.StartNew();
         var data = cvt.ToPdfAsync(CancellationToken.None).Result;
+        w.Stop();
         File.WriteAllBytes($"{rootDirectory}dual_test_{Ulid.NewUlid()}.pdf", data);
+        Console.WriteLine($"Time taken: {w.Elapsed.TotalSeconds} sec(s)");
         Assert.IsTrue(data.Length > 0);
     }
     ContentSet SetContents(string bodyHtml, string headerHtml, string footerHtml)

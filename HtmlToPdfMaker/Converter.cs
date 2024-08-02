@@ -1,5 +1,6 @@
 ﻿using DinkToPdf;
 using System.Text;
+using System.Text.RegularExpressions;
 using Utility;
 
 namespace HtmlToPdfMaker;
@@ -28,7 +29,7 @@ namespace HtmlToPdfMaker;
 /// }</code>
 /// </example>
 /// <seealso cref="Utility.Disposable" />
-public class Convert(IReadOnlyList<ContentSet> contents, string? tempRootFolder = null, Orientation orientation = Orientation.Portrait, PaperKind paperKind = PaperKind.A3) : Disposable
+public partial class Convert(IReadOnlyList<ContentSet> contents, string? tempRootFolder = null, Orientation orientation = Orientation.Portrait, PaperKind paperKind = PaperKind.A3) : Disposable
 {
     readonly GlobalSettings globalSettings = new()
     {
@@ -69,9 +70,10 @@ public class Convert(IReadOnlyList<ContentSet> contents, string? tempRootFolder 
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
             ContentSet cs = contents[counter];
+            var b = MakeTempFileAsync(dir, ContentType.Body, cs.Body.Html, cs.Body.Css, token);
             var h = MakeTempFileAsync(dir, ContentType.Header, cs.Header.Html, cs.Header.Css, token);
             var f = MakeTempFileAsync(dir, ContentType.Footer, cs.Footer.Html, cs.Footer.Css, token);
-            var b = MakeTempFileAsync(dir, ContentType.Body, cs.Body.Html, cs.Body.Css, token);
+            //await Task.WhenAll(h, f, b).ConfigureAwait(false);
             return new ObjectSettings()
             {
                 PagesCount = true,
@@ -83,6 +85,22 @@ public class Convert(IReadOnlyList<ContentSet> contents, string? tempRootFolder 
         }
         async Task<string> MakeTempFileAsync(string dir, ContentType contentType, string content, Uri cssPath, CancellationToken token)
         {
+            var pngPattern = PngPattern();
+            using HttpClient client = new();
+            var counter = 1;
+            content = pngPattern.Replace(content, m =>
+            {
+                var imageSavePath = $"{tempFolder}\\{counter}.png";
+                if (!File.Exists(imageSavePath))
+                {
+                    var u = new Uri(m.Value);
+                    var data = u.IsFile ? File.ReadAllBytes(m.Value) : client.GetByteArrayAsync(u).Result;
+                    File.WriteAllBytes(imageSavePath, data);
+                }
+                var c = new Uri(imageSavePath).ToString();
+                counter++;
+                return c;
+            });
             StringBuilder sb = new("<!doctype html><html>");
             sb.Append($"<head>");
             var style = "* { font-family: \"Arial Unicode MS\", \"Lucida Sans Unicode\", \"DejaVu Sans\", \"Quivira\", \"Symbola\", \"Code2000\" ; }";
@@ -109,4 +127,7 @@ public class Convert(IReadOnlyList<ContentSet> contents, string? tempRootFolder 
         doc.Objects.AddRange(objSettings);
         return cvt.Convert(doc);
     }
+
+    [GeneratedRegex("[\\w\\.\\/\\:\\-]+\\.((png)|(webp))", RegexOptions.IgnoreCase, "en-US")]
+    private static partial Regex PngPattern();
 }
