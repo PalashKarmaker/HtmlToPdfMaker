@@ -3,6 +3,7 @@
 [TestClass()]
 public class ConverterTests
 {
+    string rootDirectory = $"C:\\Users\\uie37359\\Downloads\\HtmlToPdfSample\\";
     [TestMethod]
     public void ToPdfTest()
     {
@@ -22,28 +23,44 @@ public class ConverterTests
             return new(body, header, footer);
         }
     }
-    [TestMethod]
-    public void ToPdfWithUrlTest()
+    [DataTestMethod]
+    [DataRow("")]
+    public void ToPdfWithUrlTest(string? language = null)
     {
         List<ContentSet> contentSets = [];
-        var bodyHtml = File.ReadAllText("C:\\Users\\PalashJKarmaker\\Downloads\\Loto\\body.html");
-        var headerHtml = File.ReadAllText("C:\\Users\\PalashJKarmaker\\Downloads\\Loto\\header.html");
-        var footerHtml = File.ReadAllText("C:\\Users\\PalashJKarmaker\\Downloads\\Loto\\footer.html");
-
-
-
+        GetContents(language, out var bodyHtml, out var headerHtml, out var footerHtml);
         contentSets.Add(SetContents(bodyHtml, headerHtml, footerHtml));
         using Convert cvt = new(contentSets);
         var data = cvt.ToPdfAsync(CancellationToken.None).Result;
-        File.WriteAllBytes(AppDomain.CurrentDomain.BaseDirectory + "\\Pdf\\test2.pdf", data);
+        File.WriteAllBytes($"{rootDirectory}test_{Ulid.NewUlid()}.pdf", data);
         Assert.IsTrue(data.Length > 0);
-
-        static ContentSet SetContents(string bodyHtml, string headerHtml, string footerHtml)
-        {
-            var header = new Content(headerHtml, new("C:\\Users\\PalashJKarmaker\\Downloads\\Loto\\header.css"));
-            var footer = new Content(headerHtml, new("C:\\Users\\PalashJKarmaker\\Downloads\\Loto\\footer.css"));
-            var body = new Content(headerHtml, new("C:\\Users\\PalashJKarmaker\\Downloads\\Loto\\body.css"));
-            return new(body, header, footer);
-        }
+    }    
+    [DataTestMethod]
+    [DataRow("")]
+    public void ToDualPdfWithUrlTest(string? language = null)
+    {
+        List<ContentSet> contentSets = [];
+        GetContents(language, out var bodyHtml, out var headerHtml, out var footerHtml);
+        contentSets.Add(SetContents(bodyHtml, headerHtml, footerHtml));
+        GetContents("Eng", out var bodyEngHtml, out var headerEngHtml, out var footerEngHtml);
+        contentSets.Add(SetContents(bodyEngHtml, headerEngHtml, footerEngHtml));
+        using Convert cvt = new(contentSets);
+        var data = cvt.ToPdfAsync(CancellationToken.None).Result;
+        File.WriteAllBytes($"{rootDirectory}dual_test_{Ulid.NewUlid()}.pdf", data);
+        Assert.IsTrue(data.Length > 0);
+    }
+    ContentSet SetContents(string bodyHtml, string headerHtml, string footerHtml)
+    {
+        var header = new Content(headerHtml, new($"{rootDirectory}header.css"));
+        var footer = new Content(footerHtml, new($"{rootDirectory}footer.css"));
+        var body = new Content(bodyHtml, new($"{rootDirectory}body.css"));
+        return new(body, header, footer);
+    }
+    void GetContents(string? language, out string bodyHtml, out string headerHtml, out string footerHtml)
+    {
+        var suffix = string.IsNullOrWhiteSpace(language) ? string.Empty : $"_{language}";
+        bodyHtml = File.ReadAllText($"{rootDirectory}body{suffix}.html");
+        headerHtml = File.ReadAllText($"{rootDirectory}header{suffix}.html");
+        footerHtml = File.ReadAllText($"{rootDirectory}footer{suffix}.html");
     }
 }
