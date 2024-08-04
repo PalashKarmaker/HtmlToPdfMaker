@@ -59,21 +59,19 @@ public partial class Convert(IReadOnlyList<ContentSet> contents, string? tempRoo
     {
         if (!Directory.Exists(tempFolder))
             Directory.CreateDirectory(tempFolder);
-        List<ObjectSettings> objSettings = [];
-        for (int i = 0; i < contents.Count; i++)
-            objSettings.Add(await BuildObjectSettings(i, token));
+
+        var objSettings = contents.AsParallel().Select(p => BuildObjectSettingsAsync(p, token).Result).ToArray();
         return GeneratePdf(objSettings);
 
-        async Task<ObjectSettings> BuildObjectSettings(int counter, CancellationToken token)
+        async Task<ObjectSettings> BuildObjectSettingsAsync(ContentSet cs, CancellationToken token)
         {
-            var dir = $"{tempFolder}\\{counter}";
+            var dir = $"{tempFolder}\\{Ulid.NewUlid()}";
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
-            ContentSet cs = contents[counter];
-            var b = MakeTempFileAsync(dir, ContentType.Body, cs.Body.Html, cs.Body.Css, token);
-            var h = MakeTempFileAsync(dir, ContentType.Header, cs.Header.Html, cs.Header.Css, token);
-            var f = MakeTempFileAsync(dir, ContentType.Footer, cs.Footer.Html, cs.Footer.Css, token);
-            //await Task.WhenAll(h, f, b).ConfigureAwait(false);
+            var b = CreateTempFilesAsync(dir, ContentType.Body, cs.Body.Html, cs.Body.Css, token);
+            var h = CreateTempFilesAsync(dir, ContentType.Header, cs.Header.Html, cs.Header.Css, token);
+            var f = CreateTempFilesAsync(dir, ContentType.Footer, cs.Footer.Html, cs.Footer.Css, token);
+            await Task.WhenAll(h, f, b).ConfigureAwait(false);
             return new ObjectSettings()
             {
                 PagesCount = true,
@@ -83,25 +81,23 @@ public partial class Convert(IReadOnlyList<ContentSet> contents, string? tempRoo
                 FooterSettings = { HtmUrl = await f, Right = "Page [page] of [toPage]", FontSize = 9 }
             };
         }
-        async Task<string> MakeTempFileAsync(string dir, ContentType contentType, string content, Uri cssPath, CancellationToken token)
+        async Task<string> CreateTempFilesAsync(string dir, ContentType contentType, string content, Uri cssPath, CancellationToken token)
         {
-            var pngPattern = PngPattern();
+            var httpImagePattern = HttpImagePattern();
             using HttpClient client = new();
-            var counter = 1;
-            content = pngPattern.Replace(content, m =>
-            {                
-                var imageSavePath = $"{tempFolder}\\{counter}.png";
+            content = httpImagePattern.Replace(content, m =>
+            {
+                var fName = Path.GetFileNameWithoutExtension(m.Value);
+                var imageSavePath = $"{dir}\\{fName}.png";
                 if (!File.Exists(imageSavePath))
                 {
-                    var u = new Uri(m.Value);
-                    var data = u.IsFile ? File.ReadAllBytes(m.Value) : client.GetByteArrayAsync(u).Result;
+                    var dataTask = client.GetByteArrayAsync(m.Value).ConfigureAwait(false).GetAwaiter();
+                    var data = dataTask.GetResult();
                     if (m.Groups["ext"].Value.Equals("webp", StringComparison.CurrentCultureIgnoreCase))
                         data = ImageConverter.Convert.To(data);
-                    File.WriteAllBytes(imageSavePath, data);
+                    File.WriteAllBytesAsync(imageSavePath, data).ConfigureAwait(false).GetAwaiter().GetResult();
                 }
-                var c = new Uri(imageSavePath).ToString();
-                counter++;
-                return c;
+                return new Uri(imageSavePath).ToString();
             });
             StringBuilder sb = new("<!doctype html><html>");
             sb.Append($"<head>");
@@ -111,7 +107,7 @@ public partial class Convert(IReadOnlyList<ContentSet> contents, string? tempRoo
             sb.Append(content);
             sb.Append("</html>");
             var path = $"{dir}\\{contentType}.html";
-            await File.WriteAllTextAsync(path, sb.ToString(), token);
+            await File.WriteAllTextAsync(path, sb.ToString(), token).ConfigureAwait(false);
             return path;
         }
     }
@@ -120,7 +116,7 @@ public partial class Convert(IReadOnlyList<ContentSet> contents, string? tempRoo
     /// </summary>
     /// <param name="objSettings">The object settings.</param>
     /// <returns></returns>
-    protected byte[] GeneratePdf(List<ObjectSettings> objSettings)
+    protected byte[] GeneratePdf(IEnumerable<ObjectSettings> objSettings)
     {
         var doc = new HtmlToPdfDocument()
         {
@@ -130,6 +126,6 @@ public partial class Convert(IReadOnlyList<ContentSet> contents, string? tempRoo
         return cvt.Convert(doc);
     }
 
-    [GeneratedRegex("[\\w\\.\\/\\:\\-]+\\.(?<ext>(png)|(webp))", RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture, "en-US")]
-    private static partial Regex PngPattern();
+    [GeneratedRegex(@"http(s)?:\/\/[\w\.\/\:\-]+\.(?<ext>(png)|(webp))", RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture, "en-US")]
+    private static partial Regex HttpImagePattern();
 }
