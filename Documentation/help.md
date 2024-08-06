@@ -5,6 +5,7 @@
 
 - [Convert](#T-HtmlToPdfMaker-Convert 'HtmlToPdfMaker.Convert')
   - [#ctor()](#M-HtmlToPdfMaker-Convert-#ctor-System-Collections-Generic-IReadOnlyList{HtmlToPdfMaker-ContentSet},System-String,DinkToPdf-Orientation,DinkToPdf-PaperKind- 'HtmlToPdfMaker.Convert.#ctor(System.Collections.Generic.IReadOnlyList{HtmlToPdfMaker.ContentSet},System.String,DinkToPdf.Orientation,DinkToPdf.PaperKind)')
+  - [handler](#F-HtmlToPdfMaker-Convert-handler 'HtmlToPdfMaker.Convert.handler')
   - [tempFolder](#F-HtmlToPdfMaker-Convert-tempFolder 'HtmlToPdfMaker.Convert.tempFolder')
   - [GeneratePdf(objSettings)](#M-HtmlToPdfMaker-Convert-GeneratePdf-System-Collections-Generic-IEnumerable{DinkToPdf-ObjectSettings}- 'HtmlToPdfMaker.Convert.GeneratePdf(System.Collections.Generic.IEnumerable{DinkToPdf.ObjectSettings})')
   - [HttpImagePattern()](#M-HtmlToPdfMaker-Convert-HttpImagePattern 'HtmlToPdfMaker.Convert.HttpImagePattern')
@@ -102,6 +103,13 @@ Usage:
 ##### See Also
 
 - [Utility.Disposable](#T-Utility-Disposable 'Utility.Disposable')
+
+<a name='F-HtmlToPdfMaker-Convert-handler'></a>
+### handler `constants`
+
+##### Summary
+
+The http client handler
 
 <a name='F-HtmlToPdfMaker-Convert-tempFolder'></a>
 ### tempFolder `constants`

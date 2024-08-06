@@ -63,6 +63,11 @@
             The tempFolder
             </summary>
         </member>
+        <member name="F:HtmlToPdfMaker.Convert.handler">
+            <summary>
+            The http client handler
+            </summary>
+        </member>
         <member name="M:HtmlToPdfMaker.Convert.ReleaseResources">
             <summary>
             Releases the resources.

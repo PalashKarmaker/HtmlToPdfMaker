@@ -1,9 +1,7 @@
 ﻿using DinkToPdf;
-using System.Collections.Concurrent;
 using System.Text;
 using System.Text.RegularExpressions;
 using Utility;
-
 namespace HtmlToPdfMaker;
 /// <summary>Class to convert html to Pdf</summary>
 /// <example>
@@ -44,34 +42,41 @@ public partial class Convert(IReadOnlyList<ContentSet> contents, string? tempRoo
     /// </summary>
     protected readonly string tempFolder = $"{tempRootFolder ?? AppDomain.CurrentDomain.BaseDirectory}\\Pdf\\{Ulid.NewUlid()}";
     /// <summary>
+    /// The http client handler
+    /// </summary>
+    protected HttpClientHandler handler = new();
+    /// <summary>
     /// Releases the resources.
     /// </summary>
     public override void ReleaseResources()
     {
-        if (Directory.Exists(tempFolder))
-            Directory.Delete(tempFolder, true);
+        //if (Directory.Exists(tempFolder))
+        //    Directory.Delete(tempFolder, true);
+        handler.Dispose();
     }
     /// <summary>
     /// Converts to pdf.
     /// </summary>
     /// <param name="token">The token.</param>
     /// <returns></returns>
-    public async Task<byte[]> ToPdfAsync(CancellationToken token)
+    public async Task<byte[]> ToPdfAsync(CancellationToken token = default)
     {
         if (!Directory.Exists(tempFolder))
             Directory.CreateDirectory(tempFolder);
-        using var handler = new HttpClientHandler();
-        var objSettings = contents.AsParallel().Select(p => BuildObjectSettingsAsync(p, token).Result).ToArray();
-        return GeneratePdf(objSettings);
+        var settingsTasks = new List<Task<ObjectSettings>>(contents.Count);
+        foreach (var p in contents)
+            settingsTasks.Add(BuildObjectSettingsAsync(p, token));
+        await Task.WhenAll(settingsTasks).ConfigureAwait(false);
+        return GeneratePdf(settingsTasks.Select(p => p.Result));
 
         async Task<ObjectSettings> BuildObjectSettingsAsync(ContentSet cs, CancellationToken token)
         {
             var dir = $"{tempFolder}\\{Ulid.NewUlid()}";
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
-            var b = CreateTempFilesAsync(dir, ContentType.Body, cs.Body.Html, cs.Body.Css, token);
-            var h = CreateTempFilesAsync(dir, ContentType.Header, cs.Header.Html, cs.Header.Css, token);
-            var f = CreateTempFilesAsync(dir, ContentType.Footer, cs.Footer.Html, cs.Footer.Css, token);
+            var b = CreateTempResourcesAsync(dir, ContentType.Body, cs.Body.Html, cs.Body.Css, token);
+            var h = CreateTempResourcesAsync(dir, ContentType.Header, cs.Header.Html, cs.Header.Css, token);
+            var f = CreateTempResourcesAsync(dir, ContentType.Footer, cs.Footer.Html, cs.Footer.Css, token);
             await Task.WhenAll(h, f, b).ConfigureAwait(false);
             return new ObjectSettings()
             {
@@ -82,33 +87,27 @@ public partial class Convert(IReadOnlyList<ContentSet> contents, string? tempRoo
                 FooterSettings = { HtmUrl = await f, Right = "Page [page] of [toPage]", FontSize = 9 }
             };
         }
-        static string CreateLocalPath(string dir, string remotePath)
-        {
-            var fName = Path.GetFileNameWithoutExtension(remotePath);
-            var imageSavePath = $"{dir}\\{fName}.png";
-            return imageSavePath;
-        }
-        async Task<string> CreateTempFilesAsync(string dir, ContentType contentType, string content, Uri cssPath, CancellationToken token)
+        string CreateLocalImagePath(string dir, string remotePath) => $"{dir}\\{Path.GetFileNameWithoutExtension(remotePath)}.png";
+        async Task<string> CreateTempResourcesAsync(string dir, ContentType contentType, string content, Uri cssPath, CancellationToken token)
         {
             var httpImagePattern = HttpImagePattern();
             var matches = httpImagePattern.Matches(content);
-            var converted = matches.DistinctBy(x => x.Value)
-                .ToDictionary(k => k.Value, v => new { Ext = v.Groups["ext"].Value, Path = CreateLocalPath(dir, v.Value) });
-            var downloader = Parallel.ForEachAsync(converted, token, async (p, token) =>
+            var localPathMap = matches.DistinctBy(x => x.Value)
+                .ToDictionary(k => k.Value, v => new { Ext = v.Groups["ext"].Value, Path = CreateLocalImagePath(dir, v.Value) });
+            var downloader = Parallel.ForEachAsync(localPathMap, token, async (p, token) =>
             {
-                var imageSavePath = p.Value.Path;
+                var localPath = p.Value.Path;
                 var ext = p.Value.Ext;
-                if (!File.Exists(imageSavePath))
+                if (!File.Exists(localPath))
                 {
                     using HttpClient client = new(handler, false);
-                    var dataTask = client.GetByteArrayAsync(p.Key, token).ConfigureAwait(false).GetAwaiter();
-                    var data = dataTask.GetResult();
-                    if (!File.Exists(imageSavePath) && ext.Equals("webp", StringComparison.CurrentCultureIgnoreCase))
+                    var data = await client.GetByteArrayAsync(p.Key, token).ConfigureAwait(false);
+                    if (!File.Exists(localPath) && ext.Equals("webp", StringComparison.CurrentCultureIgnoreCase))
                         data = ImageConverter.Convert.To(data);
-                    if (!File.Exists(imageSavePath))
+                    if (!File.Exists(localPath))
                         try
                         {
-                            await File.WriteAllBytesAsync(imageSavePath, data, token).ConfigureAwait(false);
+                            await File.WriteAllBytesAsync(localPath, data, token).ConfigureAwait(false);
                         }
                         catch (IOException exc)
                         {
@@ -116,17 +115,23 @@ public partial class Convert(IReadOnlyList<ContentSet> contents, string? tempRoo
                         }
                 }
             });
-            foreach (var (k, v) in converted)
+            foreach (var (k, v) in localPathMap)
                 content = content.Replace(k, new Uri(v.Path).ToString());
-            StringBuilder sb = new("<!doctype html><html>");
-            sb.Append($"<head>");
-            var style = "* { font-family: \"Arial Unicode MS\", \"Lucida Sans Unicode\", \"DejaVu Sans\", \"Quivira\", \"Symbola\", \"Code2000\" ; }";
-            sb.Append($"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" /><style>{style}</style><link rel=\"stylesheet\" href=\"{cssPath}\">");
-            sb.Append($"</head>");
-            sb.Append(content);
-            sb.Append("</html>");
+            var html = $$"""
+                <!doctype html>
+                <html>
+                    <head>
+                        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+                        <style>
+                            * { font-family: "Arial Unicode MS", "Lucida Sans Unicode" ; }
+                        </style>
+                        <link rel="stylesheet" href="{{cssPath}}">
+                    </head>
+                    {{content}}
+                </html>
+                """;
             var path = $"{dir}\\{contentType}.html";
-            await Task.WhenAll(File.WriteAllTextAsync(path, sb.ToString(), token), downloader).ConfigureAwait(false);
+            await Task.WhenAll(File.WriteAllTextAsync(path, html, token), downloader).ConfigureAwait(false);
             return path;
         }
     }

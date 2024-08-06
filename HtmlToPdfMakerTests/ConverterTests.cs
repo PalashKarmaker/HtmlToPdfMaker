@@ -13,7 +13,7 @@ public class ConverterTests
         contentSets.Add(SetContents("<body><h3>Спокойной ночи</h3><p>शुभ रात्रि</p><p>Português para principiantes</p><hr><p>আমি </p></body>", "<body><div><b>Спокойной ночи</b></div></body>", "Test Page"));
         contentSets.Add(SetContents("<body><div><h1>Palash J Karmaker</h1></div></body>", "<body><h3><u>Header1</u></h3>", "My page"));
         using Convert cvt = new(contentSets);
-        var data = cvt.ToPdfAsync(CancellationToken.None).Result;
+        var data = cvt.ToPdfAsync().Result;
         File.WriteAllBytes(AppDomain.CurrentDomain.BaseDirectory + "\\Pdf\\test2.pdf", data);
         Assert.IsTrue(data.Length > 0);
 
@@ -33,7 +33,7 @@ public class ConverterTests
         GetContents(language, out var bodyHtml, out var headerHtml, out var footerHtml);
         contentSets.Add(SetContents(bodyHtml, headerHtml, footerHtml));
         using Convert cvt = new(contentSets);
-        var data = cvt.ToPdfAsync(CancellationToken.None).Result;
+        var data = cvt.ToPdfAsync().Result;
         File.WriteAllBytes($"{rootDirectory}test_{Ulid.NewUlid()}.pdf", data);
         Assert.IsTrue(data.Length > 0);
     }    
@@ -48,7 +48,7 @@ public class ConverterTests
         contentSets.Add(SetContents(bodyEngHtml, headerEngHtml, footerEngHtml));
         using Convert cvt = new(contentSets);
         Stopwatch w = Stopwatch.StartNew();
-        var data = cvt.ToPdfAsync(CancellationToken.None).Result;
+        var data = cvt.ToPdfAsync().Result;
         w.Stop();
         File.WriteAllBytes($"{rootDirectory}dual_test_{Ulid.NewUlid()}.pdf", data);
         Console.WriteLine($"Time taken: {w.Elapsed.TotalSeconds} sec(s)");
